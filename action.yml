@@ -2,7 +2,7 @@ name: 'Checkov Analysis'
 description: 'Run Checkov analysis on Terraform code'
 inputs:
   directory:
-    description: 'Directory path containing Terraform code'
+    description: 'Directory path containing terraform code'
     required: true
     default: 'terraform/env'
   skip_check:
