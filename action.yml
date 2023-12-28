@@ -1,0 +1,19 @@
+name: 'Checkov Analysis'
+description: 'Run Checkov analysis on Terraform code'
+inputs:
+  directory:
+    description: 'Directory path containing Terraform code'
+    required: true
+    default: 'terraform/env'
+  skip_check:
+    description: 'Comma-separated list of Checkov IDs to skip'
+    required: false
+outputs:
+  time: 
+    description: 'The time Checkov analysis was completed'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.directory }}
+    - ${{ inputs.skip_check }}
