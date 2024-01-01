@@ -6,6 +6,9 @@ set -e
 apk update
 apk add --no-cache wget gnupg
 
+# Create the directory if it doesn't exist
+mkdir -p /usr/share/keyrings/
+
 # Fetch Trivy repository key and add the repository
 wget -qO /usr/share/keyrings/trivy.gpg https://aquasecurity.github.io/trivy-repo/deb/public.key
 
