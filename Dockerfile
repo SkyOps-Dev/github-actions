@@ -1,7 +1,5 @@
 FROM alpine:latest
 
 COPY entrypoint.sh /entrypoint.sh
-
-# Set entrypoint
+RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-
