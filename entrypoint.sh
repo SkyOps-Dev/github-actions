@@ -10,7 +10,7 @@ apk add --no-cache wget gnupg
 echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 apk add --no-cache trivy
 
-# Run Trivy configuration commands if needed
+# Run Trivy configuration commands if Needed
 trivy config "$1"
 
 
