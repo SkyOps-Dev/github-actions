@@ -7,8 +7,9 @@ apk update
 apk add --no-cache wget gnupg
 
 # Fetch Trivy repository key and add the repository
-wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | tee /usr/share/keyrings/trivy.gpg > /dev/null
-echo "https://aquasecurity.github.io/trivy-repo/deb" | tee -a /etc/apk/repositories
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+            
 
 # Install Trivy
 apk add --no-cache trivy
