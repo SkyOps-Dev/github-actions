@@ -13,7 +13,7 @@ mkdir -p /usr/share/keyrings/
 wget -qO /usr/share/keyrings/trivy.gpg https://aquasecurity.github.io/trivy-repo/deb/public.key
 
 # Add Trivy repository to sources list
-echo "https://aquasecurity.github.io/trivy-repo/deb" >> /etc/apk/repositories
+echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 
 # Install Trivy
 apk add --no-cache trivy
