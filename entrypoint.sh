@@ -19,7 +19,7 @@ echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositori
 apk add --no-cache trivy
 
 # Run Trivy configuration commands if needed
-trivy config
+trivy config terraform/env
 
 # Add additional commands or actions you want to perform here
 # ...
