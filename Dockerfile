@@ -1,10 +1,13 @@
-FROM alpine:3.10
+FROM alpine:latest
 
-RUN apk add curl \
-    &&  $ curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.16.0
+# Pull the Trivy Docker image
+RUN apk add --no-cache ca-certificates && \
+    wget -qO /usr/local/bin/trivy https://github.com/aquasecurity/trivy/releases/download/v0.20.0/trivy_0.20.0_Linux-$(apk --print-arch | sed 's/x86_64/amd64/') && \
+    chmod +x /usr/local/bin/trivy
 
-RUN docker build -t vulnerable-image .
-# Copy entrypoint script
+# Optionally, update Trivy's vulnerability database
+RUN trivy --download-db-only
+
 COPY entrypoint.sh /entrypoint.sh
 
 # Set entrypoint
