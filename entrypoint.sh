@@ -7,7 +7,10 @@ aws configure set default.region "$3"
 
 # Login to ECR
 aws ecr get-login-password --region "$3" | docker login --username AWS --password-stdin "$4"
-
+sudo apt-get update -y
+sudo apt install -y docker 
+sudo service docker start 
+docker -v
 # Build and push the Docker image
 docker build -t "$4" .
 docker tag "$4":latest "$4":latest
