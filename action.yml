@@ -1,0 +1,23 @@
+name: 'ECR Login and Push'
+description: 'Login to Amazon ECR and push image'
+inputs:
+  aws-access-key-id:
+    description: 'AWS Access Key ID'
+    required: true
+  aws-secret-access-key:
+    description: 'AWS Secret Access Key'
+    required: true
+  aws-region:
+    description: 'AWS Region'
+    required: true
+  ecr-repository:
+    description: 'ECR Repository URI'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile' 
+  args:
+    - ${{ inputs.aws-access-key-id }}
+    - ${{ inputs.aws-secret-access-key }}
+    - ${{ inputs.aws-region }}
+    - ${{ inputs.ecr-repository }}
