@@ -4,6 +4,12 @@ inputs:
   aws-account-id:
     description: 'AWS Account ID'
     required: true
+  aws-access-key-id:
+    description: 'AWS Access Key ID'
+    required: true
+  aws-secret-access-key:
+    description: 'AWS Secret Access Key'
+    required: true
   aws-region:
     description: 'AWS Region'
     required: true
@@ -31,3 +37,5 @@ runs:
     - ${{ inputs.registry-type }}
     - ${{ inputs.image-name }}
     - ${{ inputs.image-tag }}
+    - ${{ inputs.aws-account-id }}
+

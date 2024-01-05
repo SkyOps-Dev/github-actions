@@ -16,8 +16,6 @@ RUN curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-20.
     tar xzvf docker.tgz --strip 1 -C /usr/local/bin docker/docker && \
     rm docker.tgz
 
-RUN aws configure
-
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
