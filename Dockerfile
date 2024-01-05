@@ -1,16 +1,15 @@
-FROM python:3.9
+FROM amazon/aws-cli:latest
 
-RUN apt-get update && apt-get install -y \
-    curl \
-    zip
+RUN yum update -y && yum install -y \
+    yum-utils \
+    device-mapper-persistent-data \
+    lvm2
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
-    && unzip awscliv2.zip \
-    && ./aws/install \
-    && rm -rf awscliv2.zip ./aws
+RUN yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
-RUN curl -fsSL https://get.docker.com | sh
+RUN yum install -y docker-ce docker-ce-cli containerd.io
 
+RUN systemctl start docker
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
