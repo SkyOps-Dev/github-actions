@@ -1,11 +1,10 @@
 FROM docker:latest
 
 # Install AWS CLI
-RUN apk --no-cache add \
-    python3 \
-    py3-pip \
-    && pip3 install --upgrade pip \
-    && pip3 install awscli
+RUN apt update && apt upgrade \
+apt install curl \
+apt-get install zip \
+curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
 
 COPY entrypoint.sh /entrypoint.sh
 
