@@ -17,4 +17,4 @@ docker push $IMAGE_NAME:$IMAGE_TAG
 #rep name(public/private)
 #rep type
 #region
-#image tag
+##image tag
