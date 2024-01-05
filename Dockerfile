@@ -1,4 +1,4 @@
-# Use an image that includes both Docker and AWS CLI
+# Use an image that includes AWS CLI
 FROM amazon/aws-cli:latest
 
 RUN yum update -y && yum install -y \
@@ -8,8 +8,10 @@ RUN yum update -y && yum install -y \
     jq \
     curl
 
-RUN yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
-    yum install -y docker-ce docker-ce-cli containerd.io
+# Install Docker CLI manually
+RUN curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-20.10.11.tgz -o docker.tgz && \
+    tar xzvf docker.tgz --strip 1 -C /usr/local/bin docker/docker && \
+    rm docker.tgz
 
 # Install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
