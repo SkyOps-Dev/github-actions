@@ -13,8 +13,3 @@ aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --
 docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
 docker push $IMAGE_NAME:$IMAGE_TAG
-
-#rep name(public/private)
-#rep type
-#region
-##image tag
