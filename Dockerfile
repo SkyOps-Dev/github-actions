@@ -10,10 +10,14 @@ RUN yum update -y && yum install -y \
     tar \
     unzip
 
+
 # Install Docker CLI manually
 RUN curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-20.10.11.tgz -o docker.tgz && \
     tar xzvf docker.tgz --strip 1 -C /usr/local/bin docker/docker && \
     rm docker.tgz
+
+RUN aws configure
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
