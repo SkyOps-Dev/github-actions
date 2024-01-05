@@ -1,5 +1,5 @@
 # Use an image that includes AWS CLI
-FROM amazon/aws-cli:latest
+FROM amazon/aws-cli:2.0.6
 
 RUN yum update -y && yum install -y \
     yum-utils \
