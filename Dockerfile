@@ -7,7 +7,6 @@ RUN yum update -y && yum install -y \
 
 RUN yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
-RUN systemctl start docker
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
