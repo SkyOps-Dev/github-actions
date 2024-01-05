@@ -6,7 +6,8 @@ RUN yum update -y && yum install -y \
     device-mapper-persistent-data \
     lvm2 \
     jq \
-    curl
+    curl \
+    tar
 
 # Install Docker CLI manually
 RUN curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-20.10.11.tgz -o docker.tgz && \
