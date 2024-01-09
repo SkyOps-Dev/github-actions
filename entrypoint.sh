@@ -9,6 +9,7 @@ IMAGE_NAME=$6
 IMAGE_TAG=$7
 AWS_ACCOUNT_ID=$8
 
+docker logout
 aws ecr get-login-password --region $AWS_REGION | docker login -u mariaurooj -p mariaarooj10@gmail.com==991108593442.dkr.ecr.us-east-1.amazonaws.com/test
 docker build -t $IMAGE_NAME:$IMAGE_TAG .
 docker push $IMAGE_NAME:$IMAGE_TAG
