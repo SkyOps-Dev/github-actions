@@ -5,6 +5,9 @@ inputs:
   registry:  
     description: 'ECR Registry URI'
     required: true
+  repository:  
+    description: 'ECR Repository'
+    required: true
   image-name:
     description: 'Docker image name'
     required: true
@@ -21,7 +24,6 @@ runs:
       shell: bash
     - name: Build and Push Docker Image
       run: |
-        docker build -t ${{ inputs.registry }}/${{ inputs.image-name }} /usr/sbin/init
-        docker run -d -it --privileged ${{ inputs.registry }}/${{ inputs.image-name }} /usr/sbin/init
-        docker push ${{ inputs.registry }}/${{ inputs.image-name }}
+        docker build . -t ${{ inputs.registry }}/${{ inputs.repository }}:${{ inputs.image-name }} 
+        docker push ${{ inputs.registry }}/${{ inputs.repository }}:${{ inputs.image-name }}
       shell: bash
