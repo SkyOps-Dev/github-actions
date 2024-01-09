@@ -1,41 +1,26 @@
 name: 'ECR Login and Push'
-description: 'Login to Amazon ECR and push image'
-inputs:
-  aws-account-id:
-    description: 'AWS Account ID'
-    required: true
-  aws-access-key-id:
-    description: 'AWS Access Key ID'
-    required: true
-  aws-secret-access-key:
-    description: 'AWS Secret Access Key'
-    required: true
-  aws-region:
-    description: 'AWS Region'
-    required: true
-  ecr-repository:
-    description: 'ECR Repository URI'
-    required: true
-  registry-type:
-    description: 'ECR Registry Type'
-    required: false
-    default: private
-  image-name:
-    description: 'Name of the image'
-    required: true
-  image-tag:
-    description: 'Tag of the image'
-    required: true
-runs:
-  using: 'docker'
-  image: 'Dockerfile' 
-  args:
-    - ${{ inputs.aws-access-key-id }}
-    - ${{ inputs.aws-secret-access-key }}
-    - ${{ inputs.aws-region }}
-    - ${{ inputs.ecr-repository }}
-    - ${{ inputs.registry-type }}
-    - ${{ inputs.image-name }}
-    - ${{ inputs.image-tag }}
-    - ${{ inputs.aws-account-id }}
+description: 'Login to Amazon ECR and push Docker image'
 
+inputs:
+  registry:  
+    description: 'ECR Registry URI'
+    required: true
+  image-name:
+    description: 'Docker image name'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Amazon ECR
+      run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 991108593442.dkr.ecr.$AWS_REGION.amazonaws.com/test
+      shell: bash
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t ${{ inputs.registry }}/${{ inputs.image-name }} .
+        docker push ${{ inputs.registry }}/${{ inputs.image-name }}
+      shell: bash
