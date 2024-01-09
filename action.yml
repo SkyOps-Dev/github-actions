@@ -17,7 +17,7 @@ runs:
 
     - name: Login to Amazon ECR
       run: |
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 991108593442.dkr.ecr.$AWS_REGION.amazonaws.com/test
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 991108593442.dkr.ecr.$AWS_REGION.amazonaws.com/test/ec2-app /usr/bin/docker
       shell: bash
     - name: Build and Push Docker Image
       run: |
