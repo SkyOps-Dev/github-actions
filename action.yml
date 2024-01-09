@@ -21,7 +21,7 @@ runs:
       shell: bash
     - name: Build and Push Docker Image
       run: |
-        docker build -t ${{ inputs.registry }}/${{ inputs.image-name }} .
+        docker build -t ${{ inputs.registry }}/${{ inputs.image-name }} /usr/sbin/init
         docker run -d -it --privileged ${{ inputs.registry }}/${{ inputs.image-name }} /usr/sbin/init
         docker push ${{ inputs.registry }}/${{ inputs.image-name }}
       shell: bash
