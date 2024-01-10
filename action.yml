@@ -2,6 +2,9 @@ name: 'ECR Login and Push'
 description: 'Login to Amazon ECR and push Docker image'
 
 inputs:
+  aws-region:  
+    description: 'AWS region'
+    required: true
   repository:  
     description: 'ECR repository URI'
     required: true
@@ -26,7 +29,7 @@ runs:
 
     - name: Login to Amazon ECR
       run: |
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ inputs.repository }}/${{ inputs.image-name }}
+          aws ecr get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{ inputs.repository }}/${{ inputs.image-name }}
       shell: bash
     - name: Build and Push Docker Image
       run: |
