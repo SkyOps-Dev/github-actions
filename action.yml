@@ -16,7 +16,6 @@ inputs:
     required: true
   dockerfile-path:
     description: 'Path to the Dockerfile'
-    default: "ecr-login-push/Dockerfile"
     required: true
 runs:
   using: 'composite'
@@ -33,5 +32,4 @@ runs:
         echo "Dockerfile Path: ${{ inputs.dockerfile-path }}"
         docker build -f ${{ inputs.dockerfile-path }} -t ${{ inputs.image-name }}:${{ inputs.image-tag }} .
         docker push ${{ inputs.repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
-
       shell: bash
