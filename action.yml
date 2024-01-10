@@ -32,5 +32,5 @@ runs:
       run: |
         docker build -f Dockerfile -t ${{ inputs.image-name }}:${{ inputs.image-tag }} .
         docker tag ${{ inputs.image-name }}:${{ inputs.image-tag }} ${{ inputs.repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
-        docker push ${{ inputs.repository }}:${{ inputs.image-tag }}
+        docker push ${{ inputs.repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
       shell: bash
