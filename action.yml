@@ -30,7 +30,7 @@ runs:
       shell: bash
     - name: Build and Push Docker Image
       run: |
-        docker build -f Dockerfile -t test-image:latest .
-        docker tag test-image:latest 991108593442.dkr.ecr.us-east-1.amazonaws.com/test:latest
-        docker push 991108593442.dkr.ecr.us-east-1.amazonaws.com/test:latest
+        docker build -f Dockerfile -t ${{ inputs.image-name }}:${{ inputs.image-tag }} .
+        docker tag ${{ inputs.image-name }}:${{ inputs.image-tag }} ${{ inputs.repository }}:${{ inputs.image-tag }}
+        docker push ${{ inputs.repository }}:${{ inputs.image-tag }}
       shell: bash
