@@ -26,8 +26,8 @@ runs:
 
     - name: Login to Amazon ECR
       run: |
-          export AWS_PROFILE=maria
-          aws ecr get-login-password --region us-east-1 --profile maria | docker login --username AWS --password-stdin ${{ inputs.repository }}/${{ inputs.image-name }}
+          export AWS_PROFILE=default
+          aws ecr get-login-password --region us-east-1 --profile default | docker login --username AWS --password-stdin ${{ inputs.repository }}/${{ inputs.image-name }}
       shell: bash
     - name: Build and Push Docker Image
       run: |
