@@ -27,7 +27,7 @@ runs:
       uses: actions/checkout@v2
     - name: Run Script
       run: |
-        chmod +x bash.sh
+        chmod +x ./bash.sh
         ./bash.sh <aws-region> <repository> <image-name> <dockerfile> <image-tag>
       shell: bash
     # - name: Login to Amazon ECR
