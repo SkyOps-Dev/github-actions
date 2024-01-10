@@ -17,10 +17,9 @@ inputs:
   image-tag:
     description: 'docker image tag'
     required: true
-  # dockerfile-path:
-  #   description: 'Path to the Dockerfile'
-  #   default: '.'
-  #   required: true
+  dockerfile:
+    description: 'Dockerfile'
+    required: true
 runs:
   using: 'composite'
   steps:
@@ -33,7 +32,7 @@ runs:
       shell: bash
     - name: Build and Push Docker Image
       run: |
-        docker build -f Dockerfile -t ${{ inputs.image-name }}:${{ inputs.image-tag }} .
+        docker build -f ${{ inputs.dockerfile }} -t ${{ inputs.image-name }}:${{ inputs.image-tag }} .
         docker tag ${{ inputs.image-name }}:${{ inputs.image-tag }} ${{ inputs.repository }}:${{ inputs.image-tag }}
         docker push ${{ inputs.repository }}:${{ inputs.image-tag }}
       shell: bash
