@@ -16,7 +16,7 @@ inputs:
     required: true
   dockerfile-path:
     description: 'Path to the Dockerfile'
-    default: './'
+    default: '.'
     required: true
 runs:
   using: 'composite'
