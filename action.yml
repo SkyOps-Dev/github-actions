@@ -17,10 +17,10 @@ inputs:
   image-tag:
     description: 'docker image tag'
     required: true
-  dockerfile-path:
-    description: 'Path to the Dockerfile'
-    default: '.'
-    required: true
+  # dockerfile-path:
+  #   description: 'Path to the Dockerfile'
+  #   default: '.'
+  #   required: true
 runs:
   using: 'composite'
   steps:
