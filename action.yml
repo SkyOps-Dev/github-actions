@@ -30,6 +30,6 @@ runs:
       shell: bash
     - name: Build and Push Docker Image
       run: |
-        docker build -f ${{ inputs.dockerfile-path }} -t ${{ inputs.image-name }}:${{ inputs.image-tag }} .
+        docker build -f ecr-login-push/Dockerfile -t ${{ inputs.image-name }}:${{ inputs.image-tag }} .
         docker push ${{ inputs.repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
       shell: bash
