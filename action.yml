@@ -14,9 +14,6 @@ inputs:
   image-tag:
     description: 'docker image tag'
     required: true
-  dockerfile:
-    description: 'Dockerfile'
-    required: true
   registry-type:
     description: 'Type of registry (public/private)'
     required: true
