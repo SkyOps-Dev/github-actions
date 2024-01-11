@@ -25,20 +25,20 @@ runs:
   steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: test
+    # - name: test
+    #   run: |
+    #       aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/m4m9z4w0/public
+    #       docker build -t public .
+    #       docker tag public:latest public.ecr.aws/m4m9z4w0/public:latest
+    #       docker push public.ecr.aws/m4m9z4w0/public:latest
+    #   shell: bash
+    - name: Login to Amazon ECR
       run: |
-          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/m4m9z4w0/public
-          docker build -t public .
-          docker tag public:latest public.ecr.aws/m4m9z4w0/public:latest
-          docker push public.ecr.aws/m4m9z4w0/public:latest
+          aws ecr-public get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{ inputs.repository }}/${{ inputs.image-name }}
       shell: bash
-    # - name: Login to Amazon ECR
-    #   run: |
-    #       aws ecr get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{ inputs.repository }}/${{ inputs.image-name }}
-    #   shell: bash
-    # - name: Build and Push Docker Image
-    #   run: |
-    #     docker build -f ${{ inputs.dockerfile }} -t ${{ inputs.image-name }}:${{ inputs.image-tag }} .
-    #     docker tag ${{ inputs.image-name }}:${{ inputs.image-tag }} ${{ inputs.repository }}:${{ inputs.image-tag }}
-    #     docker push ${{ inputs.repository }}:${{ inputs.image-tag }}
-    #   shell: bash
+    - name: Build and Push Docker Image
+      run: |
+        docker build -f ${{ inputs.dockerfile }} -t ${{ inputs.image-name }}:${{ inputs.image-tag }} .
+        docker tag ${{ inputs.image-name }}:${{ inputs.image-tag }} ${{ inputs.repository }}:${{ inputs.image-tag }}
+        docker push ${{ inputs.repository }}:${{ inputs.image-tag }}
+      shell: bash
