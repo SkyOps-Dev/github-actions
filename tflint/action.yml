@@ -1,0 +1,8 @@
+name: 'TFLint'
+description: 'Run TFLint for Terraform linting'
+outputs:
+  time: 
+    description: 'The time TFLint was executed'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

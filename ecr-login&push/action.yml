@@ -1,0 +1,38 @@
+name: 'ECR Login and Push'
+description: 'Login to Amazon ECR and push Docker image'
+
+inputs:
+  repo-name:
+    description: 'ECR Repository name'
+    required: true
+  aws-region:  
+    description: 'AWS region'
+    required: true
+  repo-uri:  
+    description: 'ECR repository URI'
+    required: true
+  image-tag:
+    description: 'docker image tag'
+    required: true
+  registry-type:
+    description: 'Type of registry (public/private)'
+    required: true
+    default: 'private'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: ECR Login and Push
+      run: |
+        if [ "${{ inputs.registry-type }}" == "public" ]; then
+          aws ecr-public get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{inputs.repo-uri}}
+        else
+          aws ecr get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{ inputs.repo-uri }}
+        fi
+
+        docker build -t ${{ inputs.repo-name }} .
+        docker tag ${{ inputs.repo-name }}:${{ inputs.image-tag }} ${{ inputs.repo-uri }}:${{ inputs.image-tag }}
+        docker push ${{ inputs.repo-uri }}:${{ inputs.image-tag }}
+      shell: bash

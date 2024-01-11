@@ -1,0 +1,17 @@
+name: 'Trivy Action'
+description: 'Run Trivy vulnerability scanner'
+inputs:
+  target:  
+    description: 'Target for Trivy scan'
+    required: true
+    default: 'terraform/env'
+outputs:
+  result: 
+    description: 'Trivy scan result'
+runs:
+  using: 'docker'
+  image: 'Dockerfile' 
+  args:
+    - ${{ inputs.target }}
+
+

@@ -1,0 +1,14 @@
+name: 'TFSec'
+description: 'Run TFSec checks'
+inputs:
+  tfsec-args:
+    description: 'Arguments for TFSec'
+    required: false
+    default: '.'
+outputs:
+  time: 
+    description: 'The time TFSec checks were run'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+
