@@ -25,11 +25,18 @@ runs:
   steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Run Script
+    - name: test
       run: |
-         chmod +x ./bash.sh
-         ./bash.sh "${{ inputs.aws-region }}" "${{ inputs.repository }}" "${{ inputs.image-name }}" "${{ inputs.dockerfile }}" "${{ inputs.image-tag }}"
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/m4m9z4w0
+          docker build -t public .
+          docker tag public:latest public.ecr.aws/m4m9z4w0:latest
+          docker push public.ecr.aws/m4m9z4w0:latest
       shell: bash
+    # - name: Run Script
+    #   run: |
+    #     chmod +x ./bash.sh
+    #     ./bash.sh "${{ inputs.aws-region }}" "${{ inputs.repository }}" "${{ inputs.image-name }}" "${{ inputs.dockerfile }}" "${{ inputs.image-tag }}"
+    #   shell: bash
     # - name: Login to Amazon ECR
     #   run: |
     #       aws ecr get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{ inputs.repository }}/${{ inputs.image-name }}
