@@ -28,7 +28,7 @@ runs:
     - name: Run Script
       run: |
         chmod +x ./bash.sh
-        ./bash.sh <aws-region> <repository> <image-name> <dockerfile> <image-tag>
+        ./bash.sh "${{ inputs.aws-region }}" "${{ inputs.repository }}" "${{ inputs.image-name }}" "${{ inputs.dockerfile }}" "${{ inputs.image-tag }}"
       shell: bash
     # - name: Login to Amazon ECR
     #   run: |
