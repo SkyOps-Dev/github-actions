@@ -27,7 +27,7 @@ runs:
       uses: actions/checkout@v2
     - name: test
       run: |
-          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin -it public.ecr.aws/m4m9z4w0
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/m4m9z4w0
           docker build -t public .
           docker tag public:latest public.ecr.aws/m4m9z4w0/public:latest
           docker push public.ecr.aws/m4m9z4w0/public:latest
