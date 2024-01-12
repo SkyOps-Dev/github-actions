@@ -8,8 +8,8 @@ inputs:
   aws-region:  
     description: 'AWS region'
     required: true
-  repo-uri:  
-    description: 'ECR repository URI'
+  repo-url:  
+    description: 'ECR repository url'
     required: true
   image-tag:
     description: 'docker image tag'
@@ -27,12 +27,12 @@ runs:
     - name: ECR Login and Push
       run: |
         if [ "${{ inputs.registry-type }}" == "public" ]; then
-          aws ecr-public get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{inputs.repo-uri}}
+          aws ecr-public get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{inputs.repo-url}}
         else
-          aws ecr get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{ inputs.repo-uri }}
+          aws ecr get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{ inputs.repo-url }}
         fi
 
         docker build -t ${{ inputs.repo-name }} .
-        docker tag ${{ inputs.repo-name }}:${{ inputs.image-tag }} ${{ inputs.repo-uri }}:${{ inputs.image-tag }}
-        docker push ${{ inputs.repo-uri }}:${{ inputs.image-tag }}
+        docker tag ${{ inputs.repo-name }}:${{ inputs.image-tag }} ${{ inputs.repo-url }}:${{ inputs.image-tag }}
+        docker push ${{ inputs.repo-url }}:${{ inputs.image-tag }}
       shell: bash
