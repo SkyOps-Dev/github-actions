@@ -1,0 +1,56 @@
+name: 'ECS Blue-Green Deployment'
+description: 'Deploy and manage ECS services with Blue-Green deployment'
+
+inputs:
+  cluster-name:
+    description: 'ECS Cluster name'
+    required: true
+  service-name:
+    description: 'ECS Service name for the primary version'
+    required: true
+  backup-service-name:
+    description: 'ECS Service name for the backup version'
+    required: true
+  task-definition:
+    description: 'ECS Task Definition'
+    required: true
+  container-name:
+    description: 'Name of the container in the task definition'
+    required: true
+  load-balancer-url:
+    description: 'testing the new version'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Deploy Primary Version
+      run: |
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.service-name }} --task-definition ${{ inputs.task-definition }}
+      shell: bash
+    - name: Wait for Primary Deployment to Stabilize
+      run: |
+        aws ecs wait services-stable --cluster ${{ inputs.cluster-name }} --services ${{ inputs.service-name }}
+      shell: bash
+    - name: Deploy Backup Version
+      run: |
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.backup-service-name }} --task-definition ${{ inputs.task-definition }}
+      shell: bash
+    - name: Run Tests on Backup Version
+      run: |
+        echo ${{ inputs.load-balancer-url }}
+      shell: bash
+    - name: Deploy New Version to the primary service
+      run: |
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.service-name }} --task-definition ${{ inputs.task-definition }}
+      shell: bash
+    - name: Wait for New Deployment to Stabilize
+      run: |
+        aws ecs wait services-stable --cluster ${{ inputs.cluster-name }} --services ${{ inputs.service-name }}
+      shell: bash
+    - name: Cleanup Old Version
+      run: |
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.backup-service-name }} --desired-count 0
+      shell: bash
