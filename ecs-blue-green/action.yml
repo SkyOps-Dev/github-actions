@@ -57,20 +57,22 @@ runs:
         IMAGE_URI=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.repo-uri }}:${{ inputs.image-tag }})
         echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
         echo "Retrieved Image URI: $IMAGE_URI"
+      env:
+        IMAGE_URI: ${{ env.IMAGE_URI }}
       shell: bash
 
     - name: Update Task Definition Image
       id: update-task-def
       run: |
         TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "${{ inputs.task-definition }}" --region "${{ inputs.aws-region }}")
-        NEW_TASK_DEFINITION=$(echo "$NEW_TASK_DEFINITION" | jq --arg IMAGE "$IMAGE_URI" '.taskDefinition | .containerDefinitions[0].image = "$IMAGE_URI" | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities)')
-      env:
-        IMAGE_URI: ${{ env.IMAGE_URI }}
+        IMAGE_URI_WITHOUT_DIGEST=$(echo "${{ env.IMAGE_URI }}" | sed 's/@.*//')
+        echo "IMAGE_URI_WITHOUT_DIGEST=$IMAGE_URI_WITHOUT_DIGEST" >> $GITHUB_ENV
+        NEW_TASK_DEFINITION=$(echo "$TASK_DEFINITION" | jq --arg IMAGE "$IMAGE_URI_WITHOUT_DIGEST" '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities)')
       shell: bash
 
     - name: Register Updated Task Definition
       run: |
-        aws ecs register-task-definition --region "${{ inputs.aws-region }}" --family "$NEW_TASK_DEFINITION" --container-definitions "$IMAGE_URI"
+        aws ecs register-task-definition --region "${{ inputs.aws-region }}" --family "$NEW_TASK_DEFINITION" --container-definitions "$IMAGE_URI"  
       shell: bash
 
     - name: Deploy Primary Version
