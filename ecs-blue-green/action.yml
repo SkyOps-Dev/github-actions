@@ -32,7 +32,7 @@ inputs:
     required: true
     default: 'private'
   image-tag:
-    description: 'docker image tag'
+    description: 'docker Image tag'
     required: true
 
 
