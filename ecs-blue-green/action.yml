@@ -55,12 +55,13 @@ runs:
       run: |
         IMAGE_URI=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.repo-uri }}:${{ inputs.image-tag }})
         echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+        echo "Retrieved Image URI: $IMAGE_URI"
+
       shell: bash
     - name: Deploy Primary Version
       run: |
-        sed -i "s|REPLACE_WITH_IMAGE_URI|${{ needs.ecr.outputs.IMAGE_URI }}|" ${{ inputs.task-definition }}
+        sed -i "s|REPLACE_WITH_IMAGE_URI|${{ env.IMAGE_URI }}|" ${{ inputs.task-definition }}
         aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.service-name }} --task-definition ${{ inputs.task-definition }}
-        echo "IMAGE_URI: ${{ needs.ecr.outputs.IMAGE_URI }}"
       shell: bash
     - name: Wait for Primary Deployment to Stabilize
       run: |
