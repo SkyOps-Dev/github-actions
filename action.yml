@@ -1,38 +1,135 @@
-name: ECR Image Pull and Task Definition Update
+name: 'ECS Blue-Green Deployment'
 
-on:
-  push:
-    branches:
-      - main  # Adjust the branch as needed
+description: 'Deploy and manage ECS services with Blue-Green deployment'
 
-jobs:
-  update-task-definition:
-    runs-on: ubuntu-latest
+inputs:
+  cluster-name:
+    description: 'ECS Cluster name'
+    required: true
+  service-name:
+    description: 'ECS Service name for the primary version'
+    required: true
+  backup-service-name:
+    description: 'ECS Service name for the backup version'
+    required: true
+  task-family:
+    description: 'ECS Task Family name'
+    required: true
+  container-name:
+    description: 'Name of the container in the task definition'
+    required: true
+  ecr-repository:
+    description: 'ECR Repository name'
+    required: true
+  aws-region:  
+    description: 'AWS region'
+    required: true
+  repo-uri:  
+    description: 'ECR repository URI'
+    required: true
+  registry-type:
+    description: 'Type of registry (public/private)'
+    required: true
+    default: 'private'
+  image-tag:
+    description: 'docker image tag'
+    required: true
 
-    steps:
+runs:
+  using: 'composite'
+  steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Configure AWS credentials
-      run: aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} && aws configure set region ${{ secrets.AWS_REGION }}
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ inputs.aws-region }}
 
-    - name: Login to Amazon ECR
+    - name: Get ECR Login
       run: |
-        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY_URL }}
+        if [ "${{ inputs.registry-type }}" == "public" ]; then
+          aws ecr-public get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{inputs.repo-uri}}
+        else
+          aws ecr get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{ inputs.repo-uri }}
+        fi
+        docker pull ${{ inputs.repo-uri }}:${{ inputs.image-tag }}
+      shell: bash
 
-    - name: Pull image from ECR
-      run: docker pull ${{ secrets.ECR_REGISTRY_URL }}:${{ github.sha }}
-
-    - name: Extract ECR Image URI
+    - name: Get Latest ECR Image URI
       id: ecr
       run: |
-        IMAGE_URI=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.ECR_REGISTRY_URL }}:${{ github.sha }})
+        IMAGE_URI=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.repo-uri }}:${{ inputs.image-tag }})
         echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+        echo "Retrieved Image URI: $IMAGE_URI"
 
-    - name: Update ECS Task Definition
+      shell: bash
+
+    - name: Update Task Definition Image
+      id: update-task-def
       run: |
-        sed -i "s|REPLACE_WITH_IMAGE_URI|${{ needs.ecr.outputs.IMAGE_URI }}|" path/to/task-definition.json
-        # Additional steps to update ECS task definition with the new image URI
+        NEW_TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "${{ inputs.task-definition }}" --region "${{ inputs.aws-region }}")
+        NEW_TASK_DEFINITION=$(echo "$NEW_TASK_DEFINITION" | jq --arg IMAGE "$IMAGE_URI" '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities)')
+        echo "::set-output name=new-task-definition::$NEW_TASK_DEFINITION"
+      shell: bash
+      env:
+        IMAGE_URI: ${{ env.IMAGE_URI }}
 
-    - name: Debug IMAGE_URI
-      run: echo "IMAGE_URI: ${{ needs.ecr.outputs.IMAGE_URI }}"
+    - name: Register Updated Task Definition
+      run: |
+        aws ecs register-task-definition --region "${{ inputs.aws-region }}" --cli-input-json "$NEW_TASK_DEFINITION"
+      shell: bash
+
+    -     - name: Deploy Primary Version
+      run: |
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.service-name }} --task-definition "${{ inputs.task-definition }}:latest"
+      shell: bash
+
+    - name: Wait for Primary Deployment to Stabilize
+      run: |
+        aws ecs wait services-stable --cluster ${{ inputs.cluster-name }} --services ${{ inputs.service-name }}
+      shell: bash
+
+    - name: Redirect Traffic to Backup Service
+      run: |
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.service-name }} --desired-count 0
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.backup-service-name }} --desired-count 1
+      shell: bash
+
+    - name: Wait for Traffic Redirection to Stabilize
+      run: |
+        aws ecs wait services-stable --cluster ${{ inputs.cluster-name }} --services ${{ inputs.backup-service-name }}
+      shell: bash
+
+    - name: Cleanup Old Version
+      run: |
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.service-name }} --desired-count 0
+      shell: bash
+
+    - name: Deploy New Version to the primary service
+      run: |
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.service-name }} --task-definition "${{ inputs.task-definition }}:latest"
+      shell: bash
+
+    - name: Wait for New Deployment to Stabilize
+      run: |
+        aws ecs wait services-stable --cluster ${{ inputs.cluster-name }} --services ${{ inputs.service-name }}
+      shell: bash
+
+    - name: Redirect Traffic to Primary Service
+      run: |
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.service-name }} --desired-count 1
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.backup-service-name }} --desired-count 0
+      shell: bash
+
+    - name: Wait for Traffic Redirection to Stabilize
+      run: |
+        aws ecs wait services-stable --cluster ${{ inputs.cluster-name }} --services ${{ inputs.service-name }}
+      shell: bash
+
+    - name: Cleanup Old Version
+      run: |
+        aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.backup-service-name }} --desired-count 0
+      shell: bash
