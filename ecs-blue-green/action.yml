@@ -72,7 +72,7 @@ runs:
         IMAGE_URI_WITHOUT_DIGEST=$(echo "${{ env.IMAGE_URI }}" | sed 's/@.*//')
         TASK_DEFINITION_WITHOUT_ARN=$(echo "$TASK_DEFINITION" | jq 'del(.taskDefinitionArn)')
         NEW_TASK_DEFINITION=$(echo "$TASK_DEFINITION_WITHOUT_ARN" | jq --arg IMAGE "$IMAGE_URI_WITHOUT_DIGEST" '.containerDefinitions[0].image = $IMAGE')
-        echo "$NEW_TASK_DEFINITION" > updated-task-definition.json
+        echo "$NEW_TASK_DEFINITION" > --generate-cli-skeleton updated-task-definition.json
         aws ecs register-task-definition --region "${{ inputs.aws-region }}" --cli-input-json "file://updated-task-definition.json"
       shell: bash
 
