@@ -64,7 +64,7 @@ runs:
       id: update-task-def
       run: |
         TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "${{ inputs.task-definition }}" --region "${{ inputs.aws-region }}")
-        NEW_TASK_DEFINITION=$(echo "$NEW_TASK_DEFINITION" | jq --arg IMAGE "$IMAGE_URI" '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities)')
+        NEW_TASK_DEFINITION=$(echo "$NEW_TASK_DEFINITION" | jq --arg IMAGE "$IMAGE_URI" '.taskDefinition | .containerDefinitions[0].image = $IMAGE_URI | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities)')
       shell: bash
 
     - name: Register Updated Task Definition
