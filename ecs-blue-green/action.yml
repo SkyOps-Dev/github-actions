@@ -69,7 +69,7 @@ runs:
 
     - name: Register Updated Task Definition
       run: |
-        aws ecs register-task-definition --region "${{ inputs.aws-region }}" --family "$NEW_TASK_DEFINITION"
+        aws ecs register-task-definition --region "${{ inputs.aws-region }}" --family "$NEW_TASK_DEFINITION" --container-definitions "$IMAGE_URI"
       shell: bash
 
     - name: Deploy Primary Version
