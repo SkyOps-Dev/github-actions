@@ -53,14 +53,14 @@ runs:
     - name: Get Latest ECR Image URI
       id: ecr
       run: |
-        IMAGE_URI=$(aws ecr describe-images --repository-name ${{ inputs.ecr-repository }} --query 'images[0].imageUri' --output text)
+        IMAGE_URI=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.repo-uri }}:${{ inputs.image-tag }})
         echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
-
       shell: bash
     - name: Deploy Primary Version
       run: |
-        sed -i "s|REPLACE_WITH_IMAGE_URI|${IMAGE_URI}|" ${{ inputs.task-definition }}
+        sed -i "s|REPLACE_WITH_IMAGE_URI|${{ needs.ecr.outputs.IMAGE_URI }}|" ${{ inputs.task-definition }}
         aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.service-name }} --task-definition ${{ inputs.task-definition }}
+        echo "IMAGE_URI: ${{ needs.ecr.outputs.IMAGE_URI }}"
       shell: bash
     - name: Wait for Primary Deployment to Stabilize
       run: |
