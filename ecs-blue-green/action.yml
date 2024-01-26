@@ -55,15 +55,15 @@ runs:
 
     - name: Update Task Definition Image
       run: |
-        TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "service:158" --region "us-east-1")
-        echo $TASK_DEFINITION | jq '.containerDefinitions[0].image="'${NEW_ECR_IMAGE}'"' > task-def.json
+        OLD_TASK_DEF=$(aws ecs describe-task-definition --task-definition "${{ inputs.task-definition }}")
+        NEW_CONTAINER_DEFS=$(echo $OLD_TASK_DEF | jq '.taskDefinition.containerDefinitions' | jq '.[0].image="$NEW_ECR_IMAGE"')
         echo "show task-def.json"
         cat task-def.json
       shell: bash
 
     - name: Register Task Definition 
       run: |
-        aws ecs register-task-definition --family "${{ inputs.task-definition }}" --region "${{ inputs.aws-region }}" --cli-input-json file://task-def.json
+        aws ecs register-task-definition --family "service" --container-definitions "'$(echo $NEW_CONTAINER_DEFS)'"
       shell: bash
 
     - name: Deploy Primary Version
