@@ -49,31 +49,14 @@ runs:
           aws ecr get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{ inputs.repo-uri }}
         fi
         docker pull ${{ inputs.repo-uri }}:${{ inputs.image-tag }}
-      shell: bash
-
-    - name: Get Latest ECR Image URI
-      id: ecr
-      run: |
-        IMAGE_URI=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ inputs.repo-uri }}:${{ inputs.image-tag }})
-        echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
-        echo "Retrieved Image URI: $IMAGE_URI"
-      env:
-        IMAGE_URI: ${{ env.IMAGE_URI }}
+        NEW_ECR_IMAGE="${{ inputs.repo-uri }}:${{ inputs.image-tag }}"
       shell: bash
 
     - name: Update Task Definition Image
-      id: update-task-def
       run: |
         TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "${{ inputs.task-definition }}" --region "${{ inputs.aws-region }}")
-      shell: bash
-
-    - name: Register Updated Task Definition
-      run: |
-        IMAGE_URI_WITHOUT_DIGEST=$(echo "${{ env.IMAGE_URI }}" | sed 's/@.*//')
-        TASK_DEFINITION_WITHOUT_ARN=$(echo "$TASK_DEFINITION" | jq 'del(.taskDefinitionArn)')
-        NEW_TASK_DEFINITION=$(echo "$TASK_DEFINITION_WITHOUT_ARN" | jq --arg IMAGE "$IMAGE_URI_WITHOUT_DIGEST" '.containerDefinitions[0].image = $IMAGE')
-        echo "$NEW_TASK_DEFINITION" > --generate-cli-skeleton updated-task-definition.json
-        aws ecs register-task-definition --region "${{ inputs.aws-region }}" --cli-input-json "file://updated-task-definition.json"
+        echo $TASK_DEFINITION | jq '.containerDefinitions[0].image="'${NEW_ECR_IMAGE}'"' > task-def.json
+        aws ecs register-task-definition --family "${{ inputs.task-definition }}" --region "${{ inputs.aws-region }}" --cli-input-json file://task-def.json
       shell: bash
 
     - name: Deploy Primary Version
