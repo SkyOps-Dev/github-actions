@@ -64,7 +64,7 @@ runs:
 
     - name: Register Task Definition 
       run: |
-        aws ecs register-task-definition --family "service" --cli-input-json 'file://tmp.json'
+        aws ecs register-task-definition --family "service" --cli-input-json 'file:///tmp/tmp.json'
       shell: bash
 
     - name: Deploy Primary Version
