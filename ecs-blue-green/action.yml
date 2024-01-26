@@ -50,6 +50,7 @@ runs:
         fi
         docker pull ${{ inputs.repo-uri }}:${{ inputs.image-tag }}
         NEW_ECR_IMAGE="${{ inputs.repo-uri }}:${{ inputs.image-tag }}"
+        echo "Retrieved Image URI: $NEW_ECR_IMAGE"
       shell: bash
 
     - name: Update Task Definition Image
