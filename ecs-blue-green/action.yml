@@ -59,6 +59,31 @@ runs:
         echo $TASK_DEFINITION | jq '.containerDefinitions[0].image="'${NEW_ECR_IMAGE}'"' > task-def.json
         echo "show task-def.json"
         cat task-def.json
+        sudo sh -c 'echo "{
+        "family": "service:158",
+        "containerDefinitions": [
+        {
+          "name": "maria-dev-container",
+          "image": "991108593442.dkr.ecr.us-east-1.amazonaws.com/test:latest",
+          "cpu": 0,
+          "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp"
+        }
+        ],
+        "essential": true,
+        "environment": [],
+        "mountPoints": [],
+        "volumesFrom": []
+        }
+        ],
+        "networkMode": "awsvpc",
+        "cpu": "256",
+        "memory": "512"
+        }
+        " > task-def.json'
       shell: bash
 
     - name: Register Task Definition 
