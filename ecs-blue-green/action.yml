@@ -84,6 +84,8 @@ runs:
         "memory": "512"
         }
         " > task-def.json'
+        echo "show task-def.json"
+        cat task-def.json
       shell: bash
 
     - name: Register Task Definition 
