@@ -63,20 +63,20 @@ runs:
         "family": "service:158",
         "containerDefinitions": [
         {
-          "name": "maria-dev-container",
-          "image": "991108593442.dkr.ecr.us-east-1.amazonaws.com/test:latest",
-          "cpu": 0,
-          "portMappings": [
-        {
-          "containerPort": 80,
-          "hostPort": 80,
-          "protocol": "tcp"
-        }
-        ],
-        "essential": true,
-        "environment": [],
-        "mountPoints": [],
-        "volumesFrom": []
+            "name": "maria-dev-container",
+            "image": "991108593442.dkr.ecr.us-east-1.amazonaws.com/test:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": []
         }
         ],
         "networkMode": "awsvpc",
