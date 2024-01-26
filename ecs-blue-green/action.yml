@@ -41,7 +41,7 @@ runs:
   steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Get ECR Login
+    - name: Get ECR login
       run: |
         if [ "${{ inputs.registry-type }}" == "public" ]; then
           aws ecr-public get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{inputs.repo-uri}}
