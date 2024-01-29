@@ -98,7 +98,7 @@ runs:
         aws ecs update-service --cluster ${{ inputs.cluster-name }} --service ${{ inputs.service-name }} --task-definition "${{ inputs.task-definition }}:latest"
       shell: bash
 
-    - name: Wait for Primary Deployment to Stabilize
+    - name: Wait for Primary deployment to Stabilize
       run: |
         aws ecs wait services-stable --cluster ${{ inputs.cluster-name }} --services ${{ inputs.service-name }}
       shell: bash
