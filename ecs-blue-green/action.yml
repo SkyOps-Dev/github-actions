@@ -56,7 +56,7 @@ runs:
     - name: Update Task Definition Image
       run: |
          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition ${{ inputs.task-definition }} --region ${{ inputs.aws-region }})
-         NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE "$NEW_ECR_IMAGE" '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt) | del(.registeredBy)')
+         NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE "$NEW_ECR_IMAGE" '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt)| del(.deregisteredAt) | del(.registeredBy)')
          NEW_TASK_INFO=$(aws ecs register-task-definition --region ${{ inputs.aws-region }} --cli-input-json "$NEW_TASK_DEFINITION")
          NEW_REVISION=$(echo $NEW_TASK_INFO | jq '.taskDefinition.revision')
       shell: bash
