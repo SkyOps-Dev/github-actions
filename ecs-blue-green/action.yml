@@ -60,14 +60,12 @@ runs:
         echo $TASK_DEFINITION | jq --arg new_image "$NEW_ECR_IMAGE" '.taskDefinition.containerDefinitions[0].image = $new_image' > task-def.json
         echo "Updated task-def.json"
         cat task-def.json
-      # echo $TASK_DEFINITION | jq '.containerDefinitions[0].image="'${NEW_ECR_IMAGE}'"' > task-def.json
-      # echo "show task-def.json"
-      # cat task-def.json
       shell: bash
 
     - name: Register Task Definition 
       run: |
-        aws ecs register-task-definition --family "${{ inputs.task-definition }}" --region "${{ inputs.aws-region }}" --cli-input-json file://task-def.json
+        REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --cli-input-json file://task-def.json --region "us-east-1")
+        echo $REGISTERED_TASK_DEFINITION
       shell: bash
 
     - name: Deploy Primary Version
