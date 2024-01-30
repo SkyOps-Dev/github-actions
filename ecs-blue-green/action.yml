@@ -57,7 +57,7 @@ runs:
       run: |
         TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "service:158" --region "us-east-1")
         NEW_ECR_IMAGE="${{ inputs.repo-uri }}:${{ inputs.image-tag }}"
-        echo $TASK_DEFINITION | jq --arg new_image "$NEW_ECR_IMAGE" '.taskDefinition.containerDefinitions[0].image = $new_image | del(.taskDefinitionArn) | del(.taskDefinition) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt)| del(.deregisteredAt) | del(.registeredBy)' > task-def.json
+        echo $TASK_DEFINITION | jq --arg new_image "$NEW_ECR_IMAGE" '.taskDefinition.containerDefinitions[0].image = $new_image' > task-def.json
         echo "Updated task-def.json"
         cat task-def.json
       shell: bash
