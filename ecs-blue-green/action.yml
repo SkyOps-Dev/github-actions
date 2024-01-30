@@ -57,14 +57,12 @@ runs:
       run: |
         TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "service:158" --region "us-east-1")
         NEW_ECR_IMAGE="${{ inputs.repo-uri }}:${{ inputs.image-tag }}"
-        echo $TASK_DEFINITION | jq --arg new_image "$NEW_ECR_IMAGE" '.taskDefinition.containerDefinitions[0].image = $new_image | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt) | del(.registeredBy)' > task-def.json
-        echo "Updated task-def.json"
-        cat task-def.json
+        NEW_TASK_DEFINTIION=$(echo $TASK_DEFINITION | jq --arg new_image "$NEW_ECR_IMAGE" '.taskDefinition.containerDefinitions[0].image = $new_image | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities)')
       shell: bash
 
     - name: Register Task Definition 
       run: |
-        REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --family "service" --container-definitions "[{\"name\":\"maria-dev-container\",\"image\":\"$NEW_ECR_IMAGE\",\"essential\":true}]" --cli-input-json file://task-def.json --region "us-east-1")
+        REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --family "service" --container-definitions "[{\"name\":\"maria-dev-container\",\"image\":\"$NEW_ECR_IMAGE\",\"essential\":true}]" --cli-input-json "$NEW_TASK_DEFINTIION" --region "us-east-1")
         echo $REGISTERED_TASK_DEFINITION
       shell: bash
 
