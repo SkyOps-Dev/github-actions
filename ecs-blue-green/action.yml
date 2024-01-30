@@ -62,7 +62,7 @@ runs:
 
     - name: Register Task Definition 
       run: |
-        REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition --family "service" --container-definitions "[{\"name\":\"maria-dev-container\",\"image\":\"$NEW_ECR_IMAGE\",\"essential\":true}]" --cli-input-json "$NEW_TASK_DEFINITION" --region "us-east-1")
+        REGISTERED_TASK_DEFINITION=$(aws ecs register-task-definition \ --family "service" \ --container-definitions "[{\"name\":\"maria-dev-container\",\"image\":\"$NEW_ECR_IMAGE\",\"essential\":true}]" \  --cli-input-json "$NEW_TASK_DEFINITION" \ --region "us-east-1")
         echo $REGISTERED_TASK_DEFINITION
       shell: bash
 
